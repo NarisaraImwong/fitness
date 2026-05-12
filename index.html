@@ -217,4 +217,56 @@
             resetForm();
         } catch (error) {
             console.error("Sync Error:", error);
-            alert("ขออภัยค่ะ เกิดข้อผิดพลาดในการเชื่อม
+            alert("ขออภัยค่ะ เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="ph ph-cloud-arrow-up text-xl"></i> <span>บันทึกไปที่ Google Sheets</span>`;
+            status.innerText = "Cloud Ready";
+            status.classList.replace('bg-orange-500', 'bg-blue-500');
+        }
+    });
+
+    function resetForm() {
+        document.getElementById('fitness-form').reset();
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('foodList').innerHTML = '';
+        document.getElementById('machineDetails').classList.add('hidden');
+        currentFoodItems = []; currentTotalFoodKcal = 0;
+    }
+
+    function showModal() { document.getElementById('successModal').classList.remove('hidden'); }
+    function closeModal() { document.getElementById('successModal').classList.add('hidden'); }
+
+    async function calculateKcalWithAI() {
+        const food = document.getElementById('foodName').value;
+        if(!food) { alert("กรุณาพิมพ์ชื่ออาหารก่อนค่ะ"); return; }
+        
+        const aiBtn = document.getElementById('aiSearchBtn');
+        const originalText = aiBtn.innerText;
+        aiBtn.innerText = "...";
+        aiBtn.disabled = true;
+
+        try {
+            const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: `Estimate calories for this dish: "${food}". Give me only the number as a single integer.` }] }] })
+            });
+            const res = await resp.json();
+            const val = res.candidates[0].content.parts[0].text.match(/\d+/);
+            if(val) {
+                document.getElementById('singleFoodKcal').value = val[0];
+            } else {
+                alert("AI ไม่สามารถประเมินค่าได้ ลองพิมพ์ชื่ออาหารให้ชัดเจนขึ้นนะคะ");
+            }
+        } catch(e) { 
+            console.error(e); 
+            alert("การเชื่อมต่อ AI ขัดข้อง ตรวจสอบ API Key ของคุณอีกครั้งค่ะ");
+        } finally { 
+            aiBtn.innerText = originalText; 
+            aiBtn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
