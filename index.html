@@ -25,6 +25,8 @@
         .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
         .chart-container { position: relative; height: 250px; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .min-w-chart { min-width: 500px; }
+        .animate-pulse-once { animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) 1; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
 <body class="text-gray-800 pb-24">
@@ -46,15 +48,15 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow">
                             <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">วันที่</label>
-                            <input type="date" id="date" class="w-full font-bold text-blue-600 outline-none">
+                            <input type="date" id="date" class="w-full font-bold text-blue-600 outline-none bg-transparent">
                         </div>
                         <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow">
                             <label class="block text-[10px] font-bold text-gray-400 mb-1 uppercase">น้ำหนัก (kg)</label>
-                            <input type="number" id="weight" step="0.1" placeholder="0.0" class="w-full font-bold text-blue-600 outline-none">
+                            <input type="number" id="weight" step="0.1" placeholder="0.0" class="w-full font-bold text-blue-600 outline-none bg-transparent">
                         </div>
                     </div>
 
-                    <!-- AI Food Assistant (ปรับปรุงระบบ AI ใหม่) -->
+                    <!-- AI Food Assistant (Enhanced Version) -->
                     <div class="bg-emerald-50/50 p-6 rounded-[2.5rem] border border-emerald-100 card-shadow">
                         <div class="flex items-center gap-2 mb-4">
                             <i class="ph ph-sparkle text-emerald-600 text-xl"></i>
@@ -62,47 +64,52 @@
                         </div>
                         <div class="space-y-3">
                             <div class="flex gap-2">
-                                <input type="text" id="foodName" placeholder="เช่น ข้าวมันไก่ 1 จาน" class="flex-grow bg-white border border-emerald-100 rounded-xl p-3 text-sm outline-none">
-                                <button type="button" onclick="calculateKcalWithAI()" id="aiSearchBtn" class="bg-blue-600 text-white px-4 rounded-xl text-xs font-bold shadow-md active:scale-95 disabled:opacity-50">ถาม AI</button>
+                                <input type="text" id="foodName" placeholder="เช่น ข้าวมันไก่ 1 จาน" class="flex-grow bg-white border border-emerald-200 rounded-xl p-3 text-sm outline-none focus:border-emerald-400 transition-colors">
+                                <button type="button" onclick="calculateKcalWithAI()" id="aiSearchBtn" class="bg-blue-600 text-white px-4 rounded-xl text-xs font-bold shadow-md active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center min-w-[70px]">
+                                    <span id="btnText">ถาม AI</span>
+                                </button>
                             </div>
                             <div class="flex gap-2 items-end">
                                 <div class="w-1/3 relative">
-                                    <label class="text-[9px] font-bold text-emerald-600 ml-1 uppercase">Kcal</label>
-                                    <input type="number" id="singleFoodKcal" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-sm font-black text-emerald-600 outline-none" placeholder="0">
+                                    <label class="text-[9px] font-bold text-emerald-600 ml-1 uppercase tracking-tighter">พลังงาน (kcal)</label>
+                                    <input type="number" id="singleFoodKcal" class="w-full bg-white border border-emerald-200 rounded-xl p-3 text-sm font-black text-emerald-600 outline-none focus:border-emerald-400" placeholder="0">
                                     <div id="ai-loader" class="hidden absolute right-3 bottom-3"><div class="loading-spinner"></div></div>
                                 </div>
-                                <button type="button" onclick="addFoodItem()" class="flex-grow bg-emerald-600 text-white font-bold h-[46px] rounded-xl text-sm shadow-lg active:scale-95">เพิ่มในรายการ</button>
+                                <button type="button" onclick="addFoodItem()" class="flex-grow bg-emerald-600 text-white font-bold h-[46px] rounded-xl text-sm shadow-lg active:scale-95 hover:bg-emerald-700 transition-colors">เพิ่มลงในมื้อวันนี้</button>
                             </div>
-                            <p id="ai-status" class="text-[9px] text-gray-400 italic hidden"></p>
+                            <p id="ai-status" class="text-[9px] font-medium hidden text-center italic"></p>
                         </div>
-                        <div id="food-list-area" class="hidden mt-4 pt-3 border-t border-emerald-100">
-                            <ul id="foodList" class="space-y-1 mb-3"></ul>
-                            <div class="bg-emerald-600 text-white p-3 rounded-xl flex justify-between items-center shadow-inner">
-                                <span class="text-[10px] font-bold uppercase tracking-widest">แคลอรี่รวมวันนี้:</span> 
-                                <span id="foodTotalDisplay" class="font-black text-lg">0 kcal</span>
+                        <div id="food-list-area" class="hidden mt-4 pt-4 border-t border-emerald-100">
+                            <ul id="foodList" class="space-y-2 mb-4 max-h-40 overflow-y-auto pr-1"></ul>
+                            <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white p-4 rounded-2xl flex justify-between items-center shadow-lg">
+                                <div class="flex flex-col">
+                                    <span class="text-[9px] font-bold uppercase tracking-widest opacity-80">แคลอรี่รวมวันนี้</span>
+                                    <span id="foodTotalDisplay" class="font-black text-xl">0 kcal</span>
+                                </div>
+                                <i class="ph ph-fork-knife text-2xl opacity-40"></i>
                             </div>
                         </div>
                     </div>
 
                     <!-- Watch Activity -->
                     <div class="bg-blue-50/50 p-6 rounded-[2.5rem] border border-blue-100 card-shadow">
-                        <h3 class="font-bold text-blue-900 mb-4 flex items-center gap-2"><i class="ph ph-lightning text-xl"></i> Watch Activity</h3>
+                        <h3 class="font-bold text-blue-900 mb-4 flex items-center gap-2"><i class="ph ph-lightning text-xl"></i> กิจกรรมจากนาฬิกา</h3>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-white p-3 rounded-xl border border-blue-50">
-                                <label class="text-[9px] font-bold text-blue-400 block mb-1">ก้าว</label>
-                                <input type="number" id="steps" placeholder="0" class="w-full outline-none font-bold text-blue-600">
+                            <div class="bg-white p-4 rounded-2xl border border-blue-50">
+                                <label class="text-[9px] font-bold text-blue-400 block mb-1">ก้าวเดิน</label>
+                                <input type="number" id="steps" placeholder="0" class="w-full outline-none font-bold text-blue-600 bg-transparent">
                             </div>
-                            <div class="bg-white p-3 rounded-xl border border-blue-50">
+                            <div class="bg-white p-4 rounded-2xl border border-blue-50">
                                 <label class="text-[9px] font-bold text-blue-400 block mb-1">Active kcal</label>
-                                <input type="number" id="watchKcal" placeholder="0" class="w-full outline-none font-bold text-blue-600">
+                                <input type="number" id="watchKcal" placeholder="0" class="w-full outline-none font-bold text-blue-600 bg-transparent">
                             </div>
                         </div>
                     </div>
 
                     <!-- Extra Machine Workout -->
-                    <div class="bg-purple-50/50 p-6 rounded-[2.5rem] border border-purple-100 card-shadow space-y-3">
+                    <div class="bg-purple-50/50 p-6 rounded-[2.5rem] border border-purple-100 card-shadow space-y-4">
                         <h3 class="font-bold text-purple-900 flex items-center gap-2"><i class="ph ph-bicycle text-xl"></i> ออกกำลังกายเสริม (Machine)</h3>
-                        <select id="machineType" class="w-full border border-purple-100 rounded-xl p-3 outline-none text-sm bg-white font-medium">
+                        <select id="machineType" class="w-full border border-purple-200 rounded-xl p-3 outline-none text-sm bg-white font-medium focus:border-purple-400">
                             <option value="None">-- ไม่ได้เข้าเครื่อง --</option>
                             <option value="Treadmill">ลู่วิ่งไฟฟ้า (Treadmill)</option>
                             <option value="Cycling">ปั่นจักรยาน (Cycling)</option>
@@ -110,23 +117,23 @@
                             <option value="Walking">เดินเร็ว (Walking)</option>
                             <option value="WeightTraining">เวทเทรนนิ่ง</option>
                         </select>
-                        <div id="machineDetails" class="hidden grid grid-cols-3 gap-2 animate-pulse-once">
-                            <div>
-                                <label class="text-[8px] font-bold text-purple-400 block mb-1">KCAL</label>
-                                <input type="number" id="machineKcal" placeholder="0" class="w-full bg-white p-2 rounded-lg border border-purple-100 text-xs text-center font-bold outline-none">
+                        <div id="machineDetails" class="hidden grid grid-cols-3 gap-2">
+                            <div class="bg-white p-2 rounded-xl border border-purple-100">
+                                <label class="text-[8px] font-bold text-purple-400 block mb-1 text-center">KCAL</label>
+                                <input type="number" id="machineKcal" placeholder="0" class="w-full bg-transparent text-xs text-center font-bold outline-none">
                             </div>
-                            <div>
-                                <label class="text-[8px] font-bold text-purple-400 block mb-1">นาที</label>
-                                <input type="number" id="duration" placeholder="0" class="w-full bg-white p-2 rounded-lg border border-purple-100 text-xs text-center font-bold outline-none">
+                            <div class="bg-white p-2 rounded-xl border border-purple-100">
+                                <label class="text-[8px] font-bold text-purple-400 block mb-1 text-center">นาที</label>
+                                <input type="number" id="duration" placeholder="0" class="w-full bg-transparent text-xs text-center font-bold outline-none">
                             </div>
-                            <div>
-                                <label class="text-[8px] font-bold text-purple-400 block mb-1">ระยะทาง</label>
-                                <input type="number" id="distance" step="0.1" placeholder="0.0" class="w-full bg-white p-2 rounded-lg border border-purple-100 text-xs text-center font-bold outline-none">
+                            <div class="bg-white p-2 rounded-xl border border-purple-100">
+                                <label class="text-[8px] font-bold text-purple-400 block mb-1 text-center">ระยะทาง</label>
+                                <input type="number" id="distance" step="0.1" placeholder="0.0" class="w-full bg-transparent text-xs text-center font-bold outline-none">
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white font-bold py-5 rounded-[2rem] shadow-xl flex items-center justify-center gap-3 active:scale-95">
+                    <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white font-bold py-6 rounded-[2.5rem] shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all hover:bg-blue-700">
                         <i class="ph ph-paper-plane-tilt text-2xl"></i> <span>บันทึกข้อมูลลง Sheets</span>
                     </button>
                 </form>
@@ -137,33 +144,39 @@
              TAB 2: หน้าแดชบอร์ด (STATS VIEW)
              ========================================== -->
         <div id="stats-view" class="tab-content p-6">
-            <header class="mb-6">
+            <header class="mb-8">
                 <h1 class="text-2xl font-bold text-slate-800">แผงควบคุมสุขภาพ</h1>
                 <p class="text-xs text-slate-500 uppercase tracking-widest font-bold">สรุปผลภาพรวม ครูไอซ์</p>
             </header>
 
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-blue-600 p-4 rounded-[1.5rem] text-white shadow-lg">
-                    <p class="text-[8px] opacity-80 uppercase font-bold tracking-wider">น้ำหนักเฉลี่ย (7ว.)</p>
-                    <h2 class="text-xl font-black">56.2 kg</h2>
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-blue-600 p-5 rounded-[2rem] text-white shadow-lg relative overflow-hidden">
+                    <i class="ph ph-scales absolute -right-2 -bottom-2 text-5xl opacity-20"></i>
+                    <p class="text-[9px] opacity-80 uppercase font-bold tracking-wider mb-1">น้ำหนักเฉลี่ย (7ว.)</p>
+                    <h2 class="text-2xl font-black">56.2 <span class="text-xs font-normal">kg</span></h2>
                 </div>
-                <div class="bg-emerald-600 p-4 rounded-[1.5rem] text-white shadow-lg">
-                    <p class="text-[8px] opacity-80 uppercase font-bold tracking-wider">สุทธิ (Net Cal)</p>
-                    <h2 class="text-xl font-black">1,150 kcal</h2>
+                <div class="bg-emerald-600 p-5 rounded-[2rem] text-white shadow-lg relative overflow-hidden">
+                    <i class="ph ph-flame absolute -right-2 -bottom-2 text-5xl opacity-20"></i>
+                    <p class="text-[9px] opacity-80 uppercase font-bold tracking-wider mb-1">สุทธิ (Net Cal)</p>
+                    <h2 class="text-2xl font-black">1,150 <span class="text-xs font-normal">kcal</span></h2>
                 </div>
             </div>
 
             <div class="space-y-6">
-                <div class="bg-white p-5 rounded-[2rem] border border-gray-100 card-shadow">
-                    <h3 class="text-[10px] font-bold mb-4 uppercase text-slate-400">แนวโน้มน้ำหนัก</h3>
+                <div class="bg-white p-6 rounded-[2.5rem] border border-gray-100 card-shadow">
+                    <h3 class="text-[10px] font-bold mb-4 uppercase text-slate-400 flex items-center gap-2">
+                        <i class="ph ph-chart-line text-blue-500"></i> แนวโน้มน้ำหนัก
+                    </h3>
                     <div class="chart-container">
                         <div class="min-w-chart h-full">
                             <canvas id="weightChart"></canvas>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-[2rem] border border-gray-100 card-shadow">
-                    <h3 class="text-[10px] font-bold mb-4 uppercase text-slate-400">แคลอรี่ กิน vs เบิร์น</h3>
+                <div class="bg-white p-6 rounded-[2.5rem] border border-gray-100 card-shadow">
+                    <h3 class="text-[10px] font-bold mb-4 uppercase text-slate-400 flex items-center gap-2">
+                        <i class="ph ph-chart-bar text-emerald-500"></i> แคลอรี่ กิน vs เบิร์น
+                    </h3>
                     <div class="chart-container">
                         <div class="min-w-chart h-full">
                             <canvas id="calorieChart"></canvas>
@@ -174,13 +187,13 @@
         </div>
 
         <!-- Bottom Navigation Bar -->
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/90 backdrop-blur-md border-t border-gray-100 px-12 py-4 flex justify-between items-center z-50">
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/90 backdrop-blur-lg border-t border-gray-100 px-12 py-5 flex justify-between items-center z-50">
             <button onclick="switchTab('log')" id="nav-log" class="flex flex-col items-center gap-1 active-tab transition-all">
                 <i class="ph ph-note-pencil text-2xl"></i>
                 <span class="text-[9px] font-bold uppercase">บันทึก</span>
             </button>
-            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center -mt-12 shadow-xl border-4 border-white transition-transform active:scale-90 cursor-pointer" onclick="switchTab('log')">
-                <i class="ph ph-sparkle text-white text-xl"></i>
+            <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center -mt-14 shadow-2xl border-4 border-white transition-transform active:scale-90 cursor-pointer" onclick="switchTab('log')">
+                <i class="ph ph-sparkle text-white text-2xl"></i>
             </div>
             <button onclick="switchTab('stats')" id="nav-stats" class="flex flex-col items-center gap-1 text-gray-400 transition-all">
                 <i class="ph ph-chart-bar text-2xl"></i>
@@ -190,14 +203,14 @@
     </div>
 
     <!-- Modal Success -->
-    <div id="successModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center hidden z-[100] px-4">
-        <div class="bg-white rounded-[3rem] p-10 flex flex-col items-center w-full max-w-xs text-center shadow-2xl">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <i class="ph-fill ph-check-circle text-5xl text-green-500 animate-bounce"></i>
+    <div id="successModal" class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center hidden z-[100] px-4">
+        <div class="bg-white rounded-[3rem] p-10 flex flex-col items-center w-full max-w-xs text-center shadow-2xl animate-pulse-once">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                <i class="ph-fill ph-check-circle text-6xl text-green-500"></i>
             </div>
-            <h3 class="text-xl font-bold">บันทึกสำเร็จ!</h3>
-            <p class="text-xs text-gray-400 mt-2 italic">ข้อมูลถูกอัปเดตลง Sheets แล้วค่ะ</p>
-            <button onclick="location.reload()" class="mt-6 bg-blue-600 text-white py-3 rounded-xl font-bold w-full shadow-lg active:scale-95">ตกลง</button>
+            <h3 class="text-2xl font-bold text-gray-800">ส่งข้อมูลเรียบร้อย!</h3>
+            <p class="text-sm text-gray-400 mt-2 italic">เก่งมากค่ะคุณครูไอซ์<br>ข้อมูลถึง Google Sheets แล้ว</p>
+            <button onclick="location.reload()" class="mt-8 bg-blue-600 text-white py-4 rounded-2xl font-bold w-full shadow-lg active:scale-95 hover:bg-blue-700 transition-all">ทำรายการต่อไป</button>
         </div>
     </div>
 
@@ -212,23 +225,27 @@
 
     // ระบบ Tab Switching
     function switchTab(tab) {
-        document.getElementById('log-view').classList.toggle('active', tab === 'log');
-        document.getElementById('log-view').classList.toggle('hidden', tab !== 'log');
-        document.getElementById('stats-view').classList.toggle('active', tab === 'stats');
-        document.getElementById('stats-view').classList.toggle('hidden', tab !== 'stats');
-        
-        document.getElementById('nav-log').classList.toggle('active-tab', tab === 'log');
-        document.getElementById('nav-log').classList.toggle('text-gray-400', tab !== 'log');
-        document.getElementById('nav-stats').classList.toggle('active-tab', tab === 'stats');
-        document.getElementById('nav-stats').classList.toggle('text-gray-400', tab !== 'stats');
+        const logView = document.getElementById('log-view');
+        const statsView = document.getElementById('stats-view');
+        const navLog = document.getElementById('nav-log');
+        const navStats = document.getElementById('nav-stats');
 
-        if(tab === 'stats') {
+        if(tab === 'log') {
+            logView.classList.add('active'); logView.classList.remove('hidden');
+            statsView.classList.remove('active'); statsView.classList.add('hidden');
+            navLog.classList.add('active-tab'); navLog.classList.remove('text-gray-400');
+            navStats.classList.remove('active-tab'); navStats.classList.add('text-gray-400');
+        } else {
+            logView.classList.remove('active'); logView.classList.add('hidden');
+            statsView.classList.add('active'); statsView.classList.remove('hidden');
+            navLog.classList.remove('active-tab'); navLog.classList.add('text-gray-400');
+            navStats.classList.add('active-tab'); navStats.classList.remove('text-gray-400');
             setTimeout(renderCharts, 100);
         }
     }
 
     // ตั้งค่าเริ่มต้น
-    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD
 
     // Toggle เครื่องออกกำลังกาย
     document.getElementById('machineType').addEventListener('change', function() {
@@ -243,29 +260,32 @@
     });
 
     // ---------------------------------------------------------
-    // ระบบ AI ประเมินแคลอรี่ (ปรับปรุงใหม่)
+    // ระบบ AI ประเมินแคลอรี่ (Robust Version)
     // ---------------------------------------------------------
     async function calculateKcalWithAI() {
-        const food = document.getElementById('foodName').value;
+        const food = document.getElementById('foodName').value.trim();
         if(!food) return;
 
         const btn = document.getElementById('aiSearchBtn');
+        const btnText = document.getElementById('btnText');
         const loader = document.getElementById('ai-loader');
         const statusText = document.getElementById('ai-status');
         const kInput = document.getElementById('singleFoodKcal');
         
-        // UI Loading
+        // UI Reset & Loading
         btn.disabled = true;
+        btnText.innerText = "...";
         loader.classList.remove('hidden');
-        statusText.classList.remove('hidden');
-        statusText.innerText = "AI กำลังวิเคราะห์พลังงาน...";
+        statusText.classList.remove('hidden', 'text-red-500', 'text-emerald-600');
+        statusText.classList.add('text-gray-400');
+        statusText.innerText = "✨ AI กำลังวิเคราะห์โภชนาการ...";
         kInput.value = "";
 
-        // Exponential Backoff Fetch
+        // Retry Logic (Exponential Backoff)
         const fetchWithRetry = async (url, options, retries = 5, backoff = 1000) => {
             try {
                 const response = await fetch(url, options);
-                if (!response.ok) throw new Error('API Error');
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                 return await response.json();
             } catch (err) {
                 if (retries > 0) {
@@ -277,10 +297,12 @@
         };
 
         const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
+        // ปรับ Prompt ให้ AI ฉลาดขึ้นและลดการตอบเป็นประโยคที่ทำลาย Code
         const payload = {
             contents: [{ 
                 parts: [{ 
-                    text: `คุณคือผู้เชี่ยวชาญด้านโภชนาการ ประเมินแคลอรี่ของอาหารนี้: "${food}" ตอบเฉพาะ "ตัวเลขหน่วย kcal" เท่านั้น ห้ามตอบเป็นประโยค ถ้าเป็นช่วงให้เอาค่าเฉลี่ยตัวเลขเดียว` 
+                    text: `คุณคือผู้เชี่ยวชาญด้านอาหารและโภชนาการสำหรับคนออกกำลังกาย โปรดประเมินแคลอรี่ของ: "${food}" โดยให้ตอบ "เพียงตัวเลขหน่วย kcal เท่านั้น" ห้ามใส่เครื่องหมายคำถาม ห้ามใส่ตัวอักษรอื่น หากไม่แน่ใจให้ใช้ค่ากลางที่เหมาะสมที่สุดสำหรับ 1 จาน/หน่วยปกติ` 
                 }] 
             }]
         };
@@ -292,43 +314,64 @@
                 body: JSON.stringify(payload)
             });
 
-            const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
-            const kcalMatch = aiResponse.match(/\d+/);
+            const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+            // ค้นหาตัวเลขจากข้อความทั้งหมด (กรณี AI แอบตอบประโยคมาด้วย)
+            const kcalMatch = aiResponse.replace(/,/g, '').match(/\d+/);
             
             if(kcalMatch) {
-                kInput.value = kcalMatch[0];
-                statusText.innerText = `ประเมินเสร็จสิ้น! (~${kcalMatch[0]} kcal)`;
+                const finalKcal = kcalMatch[0];
+                kInput.value = finalKcal;
+                statusText.innerText = `✨ วิเคราะห์สำเร็จ! (~${finalKcal} kcal)`;
                 statusText.classList.replace('text-gray-400', 'text-emerald-600');
+                // Effect เล็กๆ ให้รู้ว่าได้ค่าแล้ว
+                kInput.parentElement.classList.add('animate-pulse-once');
+                setTimeout(() => kInput.parentElement.classList.remove('animate-pulse-once'), 1000);
             } else {
-                throw new Error("No digits found");
+                throw new Error("No numbers in AI response");
             }
         } catch(e) {
-            statusText.innerText = "ขออภัยค่ะ AI ขัดข้อง รบกวนคุณครูกรอกเองนะคะ";
+            console.error("AI Error:", e);
+            statusText.innerText = "⚠️ ขออภัยค่ะ AI ขัดข้องชั่วคราว รบกวนคุณครูกรอกเองนะคะ";
             statusText.classList.replace('text-gray-400', 'text-red-500');
         } finally {
             btn.disabled = false;
+            btnText.innerText = "ถาม AI";
             loader.classList.add('hidden');
-            setTimeout(() => { statusText.classList.add('hidden'); }, 5000);
+            // ซ่อนสถานะหลังจาก 7 วินาที
+            setTimeout(() => { if(!statusText.classList.contains('hidden')) statusText.classList.add('hidden'); }, 7000);
         }
     }
 
     function addFoodItem() {
-        const name = document.getElementById('foodName');
-        const kcal = document.getElementById('singleFoodKcal');
-        if(!kcal.value) return;
+        const nameInput = document.getElementById('foodName');
+        const kcalInput = document.getElementById('singleFoodKcal');
+        const kcalValue = parseInt(kcalInput.value);
 
-        totalFoodKcal += parseInt(kcal.value);
-        document.getElementById('foodTotalDisplay').innerText = totalFoodKcal + ' kcal';
+        if(!kcalValue || kcalValue <= 0) {
+            alert("กรุณาระบุจำนวนแคลอรี่ก่อนค่ะ");
+            return;
+        }
+
+        totalFoodKcal += kcalValue;
+        document.getElementById('foodTotalDisplay').innerText = totalFoodKcal.toLocaleString() + ' kcal';
         document.getElementById('food-list-area').classList.remove('hidden');
 
+        const foodName = nameInput.value.trim() || 'อาหารมื้อหลัก';
         const li = document.createElement('li');
-        li.className = "flex justify-between bg-white p-2.5 rounded-xl text-[11px] border border-emerald-50 mb-1.5 shadow-sm";
+        li.className = "flex justify-between items-center bg-white p-3 rounded-2xl text-xs border border-emerald-100 shadow-sm animate-pulse-once";
         li.innerHTML = `
-            <span class="text-gray-700 font-medium">${name.value || 'รายการอาหาร'}</span>
-            <b class="text-emerald-600 font-bold">${kcal.value} kcal</b>
+            <div class="flex items-center gap-2">
+                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                <span class="text-gray-700 font-medium">${foodName}</span>
+            </div>
+            <b class="text-emerald-600 font-black">${kcalValue} kcal</b>
         `;
         document.getElementById('foodList').prepend(li);
-        name.value = ''; kcal.value = '';
+        
+        // Reset Inputs
+        nameInput.value = ''; 
+        kcalInput.value = '';
+        document.getElementById('ai-status').classList.add('hidden');
     }
 
     // ---------------------------------------------------------
@@ -337,7 +380,10 @@
     document.getElementById('fitness-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submitBtn');
-        btn.disabled = true; btn.innerHTML = `<div class="loading-spinner"></div> <span>กำลังส่งข้อมูล...</span>`;
+        const originalContent = btn.innerHTML;
+        
+        btn.disabled = true; 
+        btn.innerHTML = `<div class="loading-spinner"></div> <span class="ml-2">กำลังส่งข้อมูลไป Sheets...</span>`;
         
         const payload = {
             date: document.getElementById('date').value,
@@ -352,29 +398,64 @@
         };
 
         try {
-            // การส่งแบบ mode: 'no-cors' สำหรับ Google Apps Script
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            // Google Apps Script (No-CORS Mode)
+            await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                mode: 'no-cors', 
+                cache: 'no-cache',
+                body: JSON.stringify(payload) 
+            });
+            
+            // แสดง Modal สำเร็จ
             document.getElementById('successModal').classList.remove('hidden');
         } catch(e) { 
-            alert("เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะคะ"); 
+            console.error("Submission error:", e);
+            alert("ไม่สามารถเชื่อมต่อ Google Sheets ได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง"); 
             btn.disabled = false; 
-            btn.innerHTML = `<i class="ph ph-paper-plane-tilt text-2xl"></i> <span>บันทึกข้อมูลลง Sheets</span>`; 
+            btn.innerHTML = originalContent; 
         }
     });
 
     function renderCharts() {
         const labels = ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.'];
+        
+        // Weight Chart
         const wCtx = document.getElementById('weightChart').getContext('2d');
         if (window.wChart) window.wChart.destroy();
         window.wChart = new Chart(wCtx, {
             type: 'line',
             data: {
                 labels: labels,
-                datasets: [{ label: 'น้ำหนัก (kg)', data: [56.8, 56.7, 56.7, 56.5, 56.4, 56.3, 56.2], borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)' }]
+                datasets: [{ 
+                    label: 'น้ำหนัก (kg)', 
+                    data: [56.8, 56.7, 56.7, 56.5, 56.4, 56.3, 56.2], 
+                    borderColor: '#3b82f6', 
+                    borderWidth: 3,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#3b82f6',
+                    pointBorderWidth: 2,
+                    tension: 0.4, 
+                    fill: true, 
+                    backgroundColor: (ctx) => {
+                        const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+                        gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+                        gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+                        return gradient;
+                    } 
+                }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { display: false }, ticks: { font: { size: 9 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                }
+            }
         });
 
+        // Calorie Chart
         const cCtx = document.getElementById('calorieChart').getContext('2d');
         if (window.cChart) window.cChart.destroy();
         window.cChart = new Chart(cCtx, {
@@ -382,11 +463,19 @@
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'กิน', data: [1500, 1400, 1800, 1300, 1450, 1600, 1400], backgroundColor: '#10b981', borderRadius: 4 },
-                    { label: 'เบิร์น', data: [400, 450, 300, 500, 450, 350, 400], backgroundColor: '#f59e0b', borderRadius: 4 }
+                    { label: 'กิน', data: [1500, 1400, 1800, 1300, 1450, 1600, 1400], backgroundColor: '#10b981', borderRadius: 6 },
+                    { label: 'เบิร์น', data: [400, 450, 300, 500, 450, 350, 400], backgroundColor: '#f59e0b', borderRadius: 6 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } } },
+                scales: {
+                    y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 9 } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                }
+            }
         });
     }
 </script>
